@@ -1,0 +1,14 @@
+let
+    Source ={Number.From(#date(2018,1,1))..Number.From(#date(2020,12,31))},
+    #"Converted to Table" = Table.FromList(Source, Splitter.SplitByNothing(), null, null, ExtraValues.Error),
+    #"Changed Type" = Table.TransformColumnTypes(#"Converted to Table",{{"Column1", type date}}),
+    #"Renamed Columns" = Table.RenameColumns(#"Changed Type",{{"Column1", "Date"}}),
+    #"Insert Year" = Table.AddColumn(#"Renamed Columns", "Year", each Date.Year([Date])),
+    #"Insert Month" = Table.AddColumn(#"Insert Year", "Month", each Date.Month([Date])),
+    #"Insert Week" = Table.AddColumn(#"Insert Month", "Week", each Date.WeekOfYear([Date])),
+    #"Inserted Month Name" = Table.AddColumn(#"Insert Week", "Month Name", each Date.MonthName([Date]), type text),
+    #"Inserted End of Month" = Table.AddColumn(#"Inserted Month Name", "End of Month", each Date.EndOfMonth([Date]), type date),
+    #"Inserted Day of Week" = Table.AddColumn(#"Inserted End of Month", "Day of Week", each Date.DayOfWeek([Date]), Int64.Type),
+    #"Set Datatypes Result set" = Table.TransformColumnTypes(#"Inserted Day of Week",{{"Year", Int64.Type}, {"Month", Int64.Type}, {"Week", Int64.Type}})
+in
+    #"Set Datatypes Result set"
